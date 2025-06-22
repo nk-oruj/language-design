@@ -1,7 +1,7 @@
 myModulio;
 
 MainFunctionio:
-    {integer} {integer} integer.Sum stream.Print;
+    {3} {5} integer.Sum stream.Print;
 
 
     
