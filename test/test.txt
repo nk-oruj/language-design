@@ -2,6 +2,3 @@ myModulio;
 
 MainFunctionio:
     {3} {5} integer.Sum stream.Print;
-
-
-    
