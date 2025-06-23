@@ -1,4 +1,21 @@
+
+-- myOtherModulio.mod
+
+myOtherModulio;
+
+OtherFunctionio:
+    stream.Input integer.Sum stream.Print;
+
+-- myModulio.mod
+
 myModulio;
 
 MainFunctionio:
-    {3} {5} integer.Sum stream.Print;
+    {3} {5} integer.Sum
+    integer.Dup
+    stream.Print myOtherModulio.OtherFunctionio;
+
+
+-- execution
+
+myLang myModulio.MainFunctionio -o main
