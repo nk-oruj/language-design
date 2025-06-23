@@ -12,27 +12,29 @@ extern void _close();
 #define FLOR(a) if (m_index < (a)) _close()
 #define PULL(v) (m_stack[--m_index])
 
+
 // MODULE DECLARATIONS
 
 // stream
 void stream_Input();
 void stream_Print();
 
+
 // MODULE IMPLEMENTATIONS (LOW)
 
 void stream_Input()
 {
-    char buf[32];         // buffer to hold input string
+    char buf[32];
     long size;
 
     // syscall: read(0, buf, sizeof(buf))
     __asm__ volatile (
-        "mov $0, %%rax\n\t"             // syscall number: read
-        "mov $0, %%rdi\n\t"             // stdin
-        "mov %1, %%rsi\n\t"             // buffer
-        "mov %2, %%rdx\n\t"             // length
+        "mov $0, %%rax\n\t"
+        "mov $0, %%rdi\n\t"
+        "mov %1, %%rsi\n\t"
+        "mov %2, %%rdx\n\t"
         "syscall\n\t"
-        "mov %%rax, %0"                 // store read count in size
+        "mov %%rax, %0"
         : "=r"(size)
         : "r"(buf), "r"(sizeof(buf))
         : "%rax", "%rdi", "%rsi", "%rdx"

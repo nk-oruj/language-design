@@ -12,18 +12,27 @@ extern void _close();
 #define FLOR(a) if (m_index < (a)) _close()
 #define PULL(v) (m_stack[--m_index])
 
+
 // MODULE DECLARATIONS
 
 // integer
 void integer_Sum();
 void integer_Dup();
 
+
 // MODULE IMPLEMENTATIONS (LOW)
 
 void integer_Sum()
 {
+    unsigned long long a;
+    unsigned long long b;
+
     FLOR(2);
-    PUSH(PULL() + PULL());
+    a = PULL();
+    b = PULL();
+
+    CEIL(1)
+    PUSH(a + b);
 }
 
 void integer_Dup()
@@ -32,6 +41,7 @@ void integer_Dup()
 
     FLOR(1);
     a = PULL();
+    
     CEIL(2);
     PUSH(a);
     PUSH(a);

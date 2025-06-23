@@ -12,15 +12,16 @@ extern void _close();
 #define FLOR(a) if (m_index < (a)) _close()
 #define PULL(v) (m_stack[--m_index])
 
-
 // MODULE DECLARATIONS
 
 // integer
 void integer_Sum();
 void integer_Dup();
+
 // stream
 void stream_Input();
 void stream_Print();
+
 // myOtherModulio
 void myOtherModulio_OtherFunctionio();
 

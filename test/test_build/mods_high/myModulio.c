@@ -18,12 +18,17 @@ extern void _close();
 // integer
 void integer_Sum();
 void integer_Dup();
+
 // stream
+void stream_Input();
 void stream_Print();
+
 // myOtherModulio
 void myOtherModulio_OtherFunctionio();
+
 // myModulio
 void myModulio_MainFunctionio();
+
 
 // MODULE IMPLEMENTATIONS
 
