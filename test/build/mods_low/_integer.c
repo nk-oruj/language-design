@@ -6,10 +6,10 @@
 extern unsigned long long m_stack[], m_index;
 extern void _close();
 
-#define CEIL(a) if (m_index + (a) >= SIZE) _close()
+#define LIMA(a) if (m_index + (a) >= SIZE) _close()
 #define PUSH(v) (m_stack[m_index++] = (v))
 
-#define FLOR(a) if (m_index < (a)) _close()
+#define LIMB(a) if (m_index < (a)) _close()
 #define PULL(v) (m_stack[--m_index])
 
 
@@ -27,11 +27,11 @@ void integer_Sum()
     unsigned long long a;
     unsigned long long b;
 
-    FLOR(2);
+    LIMB(2);
     a = PULL();
     b = PULL();
 
-    CEIL(1)
+    LIMA(1);
     PUSH(a + b);
 }
 
@@ -39,10 +39,10 @@ void integer_Dup()
 {
     unsigned long long a;
 
-    FLOR(1);
+    LIMB(1);
     a = PULL();
-    
-    CEIL(2);
+
+    LIMA(2);
     PUSH(a);
     PUSH(a);
 }

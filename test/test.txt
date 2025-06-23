@@ -16,6 +16,6 @@ MainFunctionio:
     stream.Print myOtherModulio.OtherFunctionio;
 
 
--- execution
+-- compilation
 
-myLang myModulio.MainFunctionio -o main
+$ myLang myModulio.MainFunctionio -o main

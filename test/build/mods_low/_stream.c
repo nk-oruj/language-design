@@ -6,10 +6,10 @@
 extern unsigned long long m_stack[], m_index;
 extern void _close();
 
-#define CEIL(a) if (m_index + (a) >= SIZE) _close()
+#define LIMA(a) if (m_index + (a) >= SIZE) _close()
 #define PUSH(v) (m_stack[m_index++] = (v))
 
-#define FLOR(a) if (m_index < (a)) _close()
+#define LIMB(a) if (m_index < (a)) _close()
 #define PULL(v) (m_stack[--m_index])
 
 
@@ -56,7 +56,7 @@ void stream_Input()
         i++;
     }
 
-    CEIL(2);
+    LIMA(2);
     PUSH(result);
 }
 
@@ -66,7 +66,7 @@ void stream_Print()
     long i = 31;
     unsigned long long n;
 
-    FLOR(1);
+    LIMB(1);
     n = PULL();
 
     buf[i--] = '\n';

@@ -1,4 +1,4 @@
-src = /test/test_build
+src = /test/build
 
 main_source = .$(src)/main.c
 mods_high = .$(src)/mods_high/myModulio.c .$(src)/mods_high/myOtherModulio.c 
