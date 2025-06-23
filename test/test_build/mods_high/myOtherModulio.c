@@ -12,6 +12,7 @@ extern void _close();
 #define FLOR(a) if (m_index < (a)) _close()
 #define PULL(v) (m_stack[--m_index])
 
+
 // MODULE DECLARATIONS
 
 // integer
@@ -24,6 +25,7 @@ void stream_Print();
 
 // myOtherModulio
 void myOtherModulio_OtherFunctionio();
+
 
 // MODULE IMPLEMENTATIONS
 
