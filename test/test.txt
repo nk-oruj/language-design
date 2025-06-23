@@ -1,20 +1,19 @@
 
 -- myOtherModulio.mod
 
-myOtherModulio;
+myOtherModulio
 
-OtherFunctionio:
-    stream.Input integer.Sum stream.Print;
+OtherFunctionio
+    stream.Input integer.Sum stream.Print ::
 
 -- myModulio.mod
 
-myModulio;
+myModulio
 
-MainFunctionio:
-    {634} {1245} integer.Sum
+MainFunctionio
+    634 1245 integer.Sum
     integer.Dup
-    stream.Print myOtherModulio.OtherFunctionio;
-
+    stream.Print myOtherModulio.OtherFunctionio ::
 
 -- compilation
 
