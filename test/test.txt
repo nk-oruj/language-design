@@ -11,7 +11,7 @@ OtherFunctionio:
 myModulio;
 
 MainFunctionio:
-    {3} {5} integer.Sum
+    {634} {1245} integer.Sum
     integer.Dup
     stream.Print myOtherModulio.OtherFunctionio;
 
