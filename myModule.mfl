@@ -2,7 +2,9 @@ module [name]
 
 extern constance [MyConstance]
 record
-    
+    [myValA] : [123]
+    [myValB] : [456]
+    [myValC] : [789]
 finish
 
 intern structure [MyStructDesc]
@@ -36,7 +38,6 @@ record
     [ccc] : array of [integer] scaled [123]
     [ddd] : [integer]
 scheme
-
     figure [myFigure]
     scheme
         
@@ -47,7 +48,6 @@ scheme
         [aaa] : set [121434]
         [bbb] : get [myVar]
     finish
-
 finish
 
 finish [name]
