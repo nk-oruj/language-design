@@ -1,0 +1,53 @@
+module [name]
+
+extern constance [MyConstance]
+record
+    
+finish
+
+intern structure [MyStructDesc]
+record
+    [myInteger] : [integer]
+    [myFractor] : [fractor]
+
+    [myArray] : array of [integer] scaled [123]
+    [myPoint] : point to [fractor]
+
+    [myStructure] : structure
+    record
+        [aaa] : [integer]
+        [bbb] : [fractor]
+    finish
+
+    [myProcedure] : procedure
+    record
+        [aaa] : set [integer]
+        [bbb] : get [fractor]
+    finish
+finish
+
+extern structure [MyStruct] : point to [MyStructDesc]
+
+extern procedure [MyProc]
+record
+    [aaa] : get [integer]
+    [bbb] : set [fractor]
+
+    [ccc] : array of [integer] scaled [123]
+    [ddd] : [integer]
+scheme
+
+    figure [myFigure]
+    scheme
+        
+    finish
+
+    launch [MyProc]
+    record
+        [aaa] : set [121434]
+        [bbb] : get [myVar]
+    finish
+
+finish
+
+finish [name]
