@@ -11,20 +11,23 @@ procedure           := __procedure, __NAME_PROCEDURE, record, scheme, __finish
 
 (* record *)
 
-record              := __record, { recordElements }
-recordElements      := __NAME_VARIABLE, __colon, [ prepos ], type
+record              := __record, recordElements
+recordElements      := { recordElement }
+recordElement       := __NAME_VARIABLE, __colon, [ prepos ], type
 
 (* scheme *)
 
 scheme              := __scheme, schemeElements
-schemeElements      := { assignment | switch | call }
+schemeElements      := { schemeElement }
+schemeElement       := assignment | switch | call
 
 (* statements *)
 
 assignment          := __assign, __NAME_VARIABLE, __with, expression
 
 switch              := __switch, __NAME_FRAME, switchElements, __finish, __NAME_FRAME
-switchElements      := { schemeElements | lift | drop }
+switchElements      := { switchElement }
+switchElement       := schemeElement | lift | drop
 
 lift                := __lift, __NAME_FRAME, [ __if, condition ]
 drop                := __drop, __NAME_FRAME, [ __if, condition ]
