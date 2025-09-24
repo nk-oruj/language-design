@@ -11,11 +11,8 @@ procedure           := __procedure, __NAME_PROCEDURE, record, scheme, __finish
 
 (* record *)
 
-record              := __record, { recordRow }
-recordRow           := __NAME_VARIABLE, __colon, [ prepos ], type
-
-recordAssign        := __record, { recordAssignRow }
-recordAssignRow     := __NAME_VARIABLE, __colon, prepos, __NAME_VARIABLE
+record              := __record, { recordElements }
+recordElements      := __NAME_VARIABLE, __colon, [ prepos ], type
 
 (* scheme *)
 
@@ -27,12 +24,15 @@ schemeElements      := { assignment | switch | call }
 assignment          := __assign, __NAME_VARIABLE, __with, expression
 
 switch              := __switch, __NAME_FRAME, switchElements, __finish, __NAME_FRAME
-switchElements      := { assignment | switch | call | lift | drop }
+switchElements      := { schemeElements | lift | drop }
 
 lift                := __lift, __NAME_FRAME, [ __if, condition ]
 drop                := __drop, __NAME_FRAME, [ __if, condition ]
 
 call                := __call, reference, recordAssign, __finish
+reference           := [ __NAME_MODULE,  __period], __NAME_PROCEDURE
+recordAssign        := __record, { recordAssignRow }
+recordAssignRow     := __NAME_VARIABLE, __colon, prepos, __NAME_VARIABLE
 
 (* expression *)
 
@@ -45,7 +45,6 @@ expression :=
 
 prepos              := __gets | __sets
 type                := __integer | __float
-reference           := [ __NAME_MODULE,  __period], __NAME_PROCEDURE
 
 (* context *)
 
