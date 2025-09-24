@@ -7,12 +7,12 @@ moduleElements      := { procedure }
 
 (* procedure *)
 
-procedure           := __procedure, __NAME_PROCEDURE, recordDeclare, scheme, __finish
+procedure           := __procedure, __NAME_PROCEDURE, record, scheme, __finish
 
 (* record *)
 
-recordDeclare       := __record, { recordDeclareRow }
-recordDeclareRow    := __NAME_VARIABLE, __colon, [ prepos ], type
+record              := __record, { recordRow }
+recordRow           := __NAME_VARIABLE, __colon, [ prepos ], type
 
 recordAssign        := __record, { recordAssignRow }
 recordAssignRow     := __NAME_VARIABLE, __colon, prepos, __NAME_VARIABLE
