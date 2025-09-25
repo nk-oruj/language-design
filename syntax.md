@@ -26,18 +26,18 @@ schemeElement       := load | call | frame
 
 load                := __load, __NAME_GET_VARIABLE, __with, expression
 
+call                := __call, reference, [ recordLoad, __finish ]
+reference           := __NAME_GET_PROCEDURE, [ __of, __NAME_GET_MODULE ]
+recordLoad          := __record, recordLoadElements
+recordLoadElements  := { recordLoadElement }
+recordLoadElement   := __NAME_GET_PARAMETER, prepos, __NAME_GET_VARIABLE
+
 frame               := __scheme, __NAME_SET_FRAME, frameElements, __finish, __NAME_SET_FRAME
 frameElements       := { frameElement }
 frameElement        := schemeElement | lift | drop
 
 lift                := __lift, __NAME_GET_FRAME, [ __if, condition ]
 drop                := __drop, __NAME_GET_FRAME, [ __if, condition ]
-
-call                := __call, reference, [ recordLoad, __finish ]
-reference           := __NAME_GET_PROCEDURE, [ __of, __NAME_GET_MODULE ]
-recordLoad          := __record, recordLoadElements
-recordLoadElements  := { recordLoadElement }
-recordLoadElement   := __NAME_GET_PARAMETER, prepos, __NAME_GET_VARIABLE
 
 (* expression *)
 
