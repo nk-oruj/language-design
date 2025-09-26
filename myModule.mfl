@@ -1,16 +1,14 @@
 module [name]
 
-extern constance [MyConstance]
-record
-    [myValA] : [123]
-    [myValB] : [456]
-    [myValC] : [789]
-finish
-
 intern structure [MyStructDesc]
 record
+    [myConstantInteger] : [1234567]
+    [myConstantFractor] : [123.567]
+
     [myInteger] : [integer]
     [myFractor] : [fractor]
+
+    [myCustom] : [myTypesModule].[Custom]
 
     [myArray] : array of [integer] scaled [123]
     [myPoint] : point to [fractor]
@@ -36,12 +34,29 @@ record
     [bbb] : set [fractor]
 
     [ccc] : array of [integer] scaled [123]
-    [ddd] : [integer]
+    [ddd] : point to [integer]
+
+    [counter] : [integer]
 scheme
-    figure [myFigure]
-    scheme
-        
-    finish
+    ]* expressions & assignments not final? *[
+    assign [counter] : [0]
+    
+    extent [Loop]
+      
+        depart [Loop] if : [counter] [5] greater_equal
+
+        launch [Out].[PrintInteger]
+        record
+            [value] : set [counter]
+        finish
+
+        assign
+            [counter] : [counter] [1] add
+        finish
+
+        repeat [Loop]
+    
+    extent [Loop]
 
     launch [MyProc]
     record
