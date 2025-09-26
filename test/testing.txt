@@ -1,0 +1,49 @@
+(* this is a module comment *)
+(* here we talk about the idea *)
+(* that brought us to the creation *)
+(* of this damned module *)
+module MyModule
+
+(* this is some comment *)
+(* to describe the procedure *)
+(* yeah so i like it a lot i guess *)
+procedure MyProcedure
+record
+    myVarA gets [integer]
+    myVarB sets [float]
+    myVarC [float]
+
+scheme
+    
+    (* this is the design *)
+    (* for assignment statement *)
+    (* and expression evaluation *)
+    load myVarA with (mul myVarA (add myVarA 1))
+
+    (* this is the design *)
+    (* for control flow, i guess *)
+    (* i spent a lot of time designing perfect structures *)
+    (* so instead consider this or leave it *)
+    scheme myFrame
+        lift myFrame if (...)
+        drop myFrame if (...)
+    finish myFrame     
+
+    (* this is the design *)
+    (* for procedure ivocation *)
+    (* multi-parameter and multi-value *)
+    (* so enjoy it *)
+    call MyOtherProcedure of MyOtherModule
+    record
+        paramA gets myVarA
+        paramB gets myVarC
+        result sets myVarB
+    finish
+
+    (* i mean *)
+    (* at least some value to return *)
+    load myVarC with (add myVarC (mul 3.14 myVarC))
+
+finish
+
+finish MyModule
