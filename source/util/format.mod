@@ -67,16 +67,15 @@ BEGIN
     END;
 END AppendChr;
 
-PROCEDURE AppendInt*(VAR destination : ARRAY OF CHAR; int : INTEGER);
+PROCEDURE AppendInt*(VAR destination : ARRAY OF CHAR; int : LONGINT);
 VAR
-  index, digit, length  : INTEGER;
+  index, digit, length  : LONGINT;
   isNegative            : BOOLEAN;
   temp                  : ARRAY 16 OF CHAR;
 BEGIN
     (* check zero value *)
     IF int = 0 THEN
-        destination[0] := "0";
-        destination[1] := 0X;
+        AppendChr(destination, "0");
         RETURN;
     END;
 

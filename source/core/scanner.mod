@@ -2,153 +2,129 @@ MODULE scanner;
 (* atropos *)
 
 IMPORT
-    Files;
-    
-(*  *)
+    Files,
+    format, stream;
 
 CONST
-    invalid*    = 0;
-    eof*        = 1;    
-    lparen*     = 2;
-    rparen*     = 3;
-    lbracket*   = 4;
-    rbracket*   = 5;
-    name*       = 6;
-    integer*    = 7;
-    float*      = 8;
-    procedure*  = 9;
-    module*     = 10;
-    record*     = 11;
-    scheme*     = 12;
-    finish*     = 13;
-    gets*       = 14;
-    sets*       = 15;
-    load*       = 16;
-    with*       = 17;
-    call*       = 18;
-    lift*       = 19;
-    drop*       = 20;
-    add*        = 21;
-    sub*        = 22;
-    mul*        = 23;
-    div*        = 24;
-    shr*        = 25;
-    shl*        = 26;
-    eq*         = 27;
-    ne*         = 28;
-    ge*         = 29;
-    gt*         = 30;
-    le*         = 31;
-    lt*         = 32;
-    or*         = 33;
-    xor*        = 34;
-    and*        = 35;
-    not*        = 36;
-    if*         = 37;
-    of*         = 38;
+    invalidSym*     = 0;
+    eofSym*         = 1;
 
-(*  *)
+    lparenSym*      = 2;
+    rparenSym*      = 3;
+    lbracketSym*    = 4;
+    rbracketSym*    = 5;
 
+    nameSym*        = 6;
+    integerSym*     = 7;
+    floatSym*       = 8;
 
-PROCEDURE riderGoBack(VAR rider : Files.Rider, file : Files.File);
+    procedureSym*   = 9;
+    moduleSym*      = 10;
+    recordSym*      = 11;
+    schemeSym*      = 12;
+    finishSym*      = 13;
+    getsSym*        = 14;
+    setsSym*        = 15;
+    loadSym*        = 16;
+    withSym*        = 17;
+    callSym*        = 18;
+    liftSym*        = 19;
+    dropSym*        = 20;
+    addSym*         = 21;
+    subSym*         = 22;
+    mulSym*         = 23;
+    divSym*         = 24;
+    shrSym*         = 25;
+    shlSym*         = 26;
+    eqSym*          = 27;
+    neSym*          = 28;
+    geSym*          = 29;
+    gtSym*          = 30;
+    leSym*          = 31;
+    ltSym*          = 32;
+    orSym*          = 33;
+    xorSym*         = 34;
+    andSym*         = 35;
+    notSym*         = 36;
+    ifSym*          = 37;
+    ofSym*          = 38;
+
+TYPE
+    SymbolDesc* = RECORD
+        id*             : INTEGER;
+        spanStart*      : LONGINT;
+        spanEnd*        : LONGINT;
+        spanSize*       : LONGINT;
+        value*           : ARRAY 64 OF CHAR;
+    END;
+    Symbol* = POINTER TO SymbolDesc;
+
+PROCEDURE StartSymbol(VAR symbol : Symbol; source : stream.File);
+BEGIN
+
+    symbol.spanStart := Files.Pos(source.rider);
+    format.Clear(symbol.value);
+
+END StartSymbol;
+
+PROCEDURE FinishSymbol(VAR symbol : Symbol; source : stream.File; id : INTEGER);
+BEGIN
+
+    symbol.id := id;
+    symbol.spanEnd := Files.Pos(source.rider);
+    symbol.spanSize := symbol.spanEnd - symbol.spanStart;
+
+END FinishSymbol;
+
+PROCEDURE ScanName*(VAR symbol : Symbol; source : stream.File);
 VAR
-    pos : INT32;
+    token : CHAR;
 
 BEGIN
 
-    pos = Files.Pos(rider);
-    
-    IF pos > 0
-    THEN
-        pos := pos - 1;
+    REPEAT
+        format.AppendChr(symbol.value, token);
+        Files.Read(source.rider, token);
+    UNTIL ~(((token >= "a") & (token <= "z")) OR ((token >= "A") & (token <= "Z")));
 
-    Files.Set(rider, file, pos);
+    FinishSymbol(symbol, source, nameSym);
 
-END;
+END ScanName;
 
-PROCEDURE Scan*(VAR symbol : INTEGER; VAR rider : Files.Rider);
+PROCEDURE ScanSymbol*(VAR symbol : Symbol; source : stream.File);
 VAR
-    chr : CHAR;
+    token : CHAR;
+
 BEGIN
 
-    (* if control characters, skip through *)
-    chr := 0X; WHILE (~rider.eof) & (chr <= " ")
-    DO
-        Files.Read(rider, chr);
-    END;
+    NEW(symbol);
 
-    (* if end of file, return end of file symbol *)
-    IF rider.eof
-    THEN
-        symbol := eof;
-        RETURN;
-    END;
-
-    (* if potential comment, process through *)
-    IF chr = "#"
-    THEN
-        WHILE (~rider.eof) & (chr # CHR(10))
-        DO
-            Files.Read(rider, chr);
+    (* passing through control characters *)
+    REPEAT
+        IF source.rider.eof
+        THEN
+            StartSymbol(symbol, source);
+            FinishSymbol(symbol, source, eofSym);
+            RETURN;
         END;
 
-        Scan(symbol, rider);
-        RETURN;
-    END;
+        Files.Read(source.rider, token);
+    UNTIL token > 20X;
 
-    (* match through these characters *)
-    IF chr = CHR(62)
+    StartSymbol(symbol, source);
+
+    IF (((token >= "a") & (token <= "z")) OR ((token >= "A") & (token <= "Z")))
     THEN
-        symbol := right;
+        stream.RevertByte(source);
+        ScanName(symbol, source);
+        stream.RevertByte(source);
         RETURN;
     END;
 
-    IF chr = CHR(60)
-    THEN
-        symbol := left;
-        RETURN;
-    END;
-
-    IF chr = CHR(43)
-    THEN
-        symbol := increase;
-        RETURN;
-    END;
-
-    IF chr = CHR(45)
-    THEN
-        symbol := decrease;
-        RETURN;
-    END;
-
-    IF chr = CHR(44)
-    THEN
-        symbol := input;
-        RETURN;
-    END;
-
-    IF chr = CHR(46)
-    THEN
-        symbol := output;
-        RETURN;
-    END;
-
-    IF chr = CHR(91)
-    THEN
-        symbol := fjump;
-        RETURN;
-    END;
-
-    IF chr = CHR(93)
-    THEN
-        symbol := bjump;
-        RETURN;
-    END;
-
-    (* if nothing matches, then it's invalid character *)
-    symbol := invalid;
+    format.AppendChr(symbol.value, token);
+    FinishSymbol(symbol, source, invalidSym);
     RETURN;
 
-END Scan;
+END ScanSymbol;
 
 END scanner.

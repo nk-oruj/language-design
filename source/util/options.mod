@@ -2,65 +2,64 @@ MODULE options;
 
 IMPORT
     Args, Files,
-    errors, format;
-
-(*  *)
+    errors, format, stream;
 
 TYPE
-    SetupDataDesc = RECORD
-        sourceFile, targetFile      : Files.File;
-        sourceRider*, targetRider*  : Files.Rider;
+    OptionsDataDesc* = RECORD
+        source*, target* : stream.File;
     END;
-    SetupData* = POINTER TO SetupDataDesc;
+    OptionsData* = POINTER TO OptionsDataDesc;
 
-(*  *)
-
-PROCEDURE Setup*(VAR setup : SetupData) : errors.Error;
+PROCEDURE CreateSetup*(VAR setup : OptionsData) : errors.Error;
 VAR
-    errorMessage            : ARRAY 256 OF CHAR;
+    error                   : errors.Error;
+    message                 : ARRAY 256 OF CHAR;
     sourcePath, targetPath  : ARRAY 128 OF CHAR;
+
 BEGIN
+
     NEW(setup);
 
     IF Args.argc # 3
     THEN
-        RETURN errors.Pipe(NIL, "options", "error in usage: ./braineron <source> <target>");
+        RETURN errors.Pipe(NIL, "options", "error in usage: ./alpha <source> <target>");
     END;
 
     Args.Get(1, sourcePath);
     Args.Get(2, targetPath);
     
-    setup.sourceFile := Files.Old(sourcePath);
-    IF setup.sourceFile = NIL
-    THEN
-        format.Clear(errorMessage);
-        format.AppendStr(errorMessage, "source not found at ");
-        format.AppendChr(errorMessage, CHR(34));
-        format.AppendStr(errorMessage, sourcePath);
-        format.AppendChr(errorMessage, CHR(34));
-        RETURN errors.Pipe(NIL, "options", errorMessage);
-    END;
-    Files.Set(setup.sourceRider, setup.sourceFile, 0);
+    error := stream.OpenOld(setup.source, sourcePath);
 
-    setup.targetFile := Files.New(targetPath);
-    IF setup.sourceFile = NIL
+    IF error # NIL
     THEN
-        format.Clear(errorMessage);
-        format.AppendStr(errorMessage, "target not found at ");
-        format.AppendChr(errorMessage, CHR(34));
-        format.AppendStr(errorMessage, sourcePath);
-        format.AppendChr(errorMessage, CHR(34));
-        RETURN errors.Pipe(NIL, "options", errorMessage);
+        format.Clear(message);
+        format.AppendStr(message, "couldn't open the source file");
+
+        RETURN errors.Pipe(error, "options", message);
     END;
-    Files.Set(setup.targetRider, setup.targetFile, 0);
+    
+    error := stream.OpenNew(setup.target, targetPath);
+
+    IF error # NIL
+    THEN
+        format.Clear(message);
+        format.AppendStr(message, "couldn't open the target file");
+
+        RETURN errors.Pipe(error, "options", message);
+    END;
 
     RETURN NIL;
-END Setup;
 
-PROCEDURE CloseSetup*(VAR setup : SetupData);
+END CreateSetup;
+
+PROCEDURE CloseSetup*(VAR setup : OptionsData);
 BEGIN
-    Files.Close(setup.sourceFile);
-    Files.Register(setup.targetFile);
+
+    Files.Register(setup.target.content);
+    
+    Files.Close(setup.source.content);
+    Files.Close(setup.target.content);
+
 END CloseSetup;
 
 END options.

@@ -31,12 +31,12 @@ finish
 
 procedure TestingFibonachi
 record
-    index       gets [integer]
-    value       sets [integer]
+    index gets [integer]
+    value sets [integer]
 
-    elementA    [integer]
-    elementB    [integer]
-    elementC    [integer]
+    elementA [integer]
+    elementB [integer]
+    elementC [integer]
 
 scheme
 
