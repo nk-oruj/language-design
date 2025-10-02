@@ -1,4 +1,4 @@
-MODULE braineron;
+MODULE alpha;
 
 IMPORT
     Files, Out,
@@ -19,6 +19,8 @@ BEGIN
         errors.Raise(error, "meta");
         RETURN;
     END;
+
+    NEW(symbol);
 
     REPEAT
         scanner.ScanSymbol(symbol, setup.source);
@@ -48,4 +50,4 @@ BEGIN
 
     (* closing options setup *)
     options.CloseSetup(setup);
-END braineron.
+END alpha.

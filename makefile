@@ -14,7 +14,7 @@ build-modules:
 		fi; \
 	done; \
 	if [ $$failure -ne 0 ]; then \
-		$(MAKE) build-modules; \
+        $(MAKE) build-modules; \
 	fi
 
 build-target:

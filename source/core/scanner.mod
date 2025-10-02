@@ -2,10 +2,11 @@ MODULE scanner;
 (* atropos *)
 
 IMPORT
-    Files,
+    Files, Out,
     format, stream;
 
 CONST
+
     invalidSym*     = 0;
     eofSym*         = 1;
 
@@ -16,7 +17,7 @@ CONST
 
     nameSym*        = 6;
     integerSym*     = 7;
-    floatSym*       = 8;
+    floaterSym*     = 8;
 
     procedureSym*   = 9;
     moduleSym*      = 10;
@@ -47,7 +48,7 @@ CONST
     andSym*         = 35;
     notSym*         = 36;
     ifSym*          = 37;
-    ofSym*          = 38;
+    fromSym*          = 38;
 
 TYPE
     SymbolDesc* = RECORD
@@ -55,7 +56,7 @@ TYPE
         spanStart*      : LONGINT;
         spanEnd*        : LONGINT;
         spanSize*       : LONGINT;
-        value*           : ARRAY 64 OF CHAR;
+        value*          : ARRAY 64 OF CHAR;
     END;
     Symbol* = POINTER TO SymbolDesc;
 
@@ -72,24 +73,127 @@ BEGIN
 
     symbol.id := id;
     symbol.spanEnd := Files.Pos(source.rider);
-    symbol.spanSize := symbol.spanEnd - symbol.spanStart;
+    symbol.spanSize := symbol.spanEnd - symbol.spanStart + 1;
 
 END FinishSymbol;
 
-PROCEDURE ScanName*(VAR symbol : Symbol; source : stream.File);
+PROCEDURE LoadToken(VAR token : CHAR; VAR symbol : Symbol; source : stream.File);
+BEGIN
+ 
+    format.AppendChr(symbol.value, token);
+    Files.Read(source.rider, token);
+
+END LoadToken;
+
+PROCEDURE ScanNominal(VAR token : CHAR; VAR symbol : Symbol; source : stream.File);
+BEGIN
+
+    WHILE (((token >= "a") & (token <= "z")) OR ((token >= "A") & (token <= "Z")))
+    DO
+        LoadToken(token, symbol, source);
+    END;
+
+    stream.RevertByte(source);
+    FinishSymbol(symbol, source, nameSym);
+
+END ScanNominal;
+
+PROCEDURE ScanNumeral(VAR token : CHAR; VAR symbol : Symbol; source : stream.File);
 VAR
-    token : CHAR;
+    last : CHAR;
 
 BEGIN
 
-    REPEAT
+    IF token = "0"
+    THEN
         format.AppendChr(symbol.value, token);
         Files.Read(source.rider, token);
-    UNTIL ~(((token >= "a") & (token <= "z")) OR ((token >= "A") & (token <= "Z")));
+        
+        IF (((token >= "a") & (token <= "z")) OR ((token >= "A") & (token <= "Z")) OR ((token >= "0") & (token <= "9")))
+        THEN
+            format.AppendChr(symbol.value, token);
+            FinishSymbol(symbol, source, invalidSym);
+            RETURN;
+        ELSIF token = "."
+        THEN
+            format.AppendChr(symbol.value, token);
+        ELSE
+            stream.RevertByte(source);
+            FinishSymbol(symbol, source, integerSym);
+            RETURN;
+        END;    
+    ELSE
+        WHILE (token >= "0") & (token <= "9")
+        DO
+            format.AppendChr(symbol.value, token);
+            Files.Read(source.rider, token);
+        END;
+ 
+        IF (((token >= "a") & (token <= "z")) OR ((token >= "A") & (token <= "Z")))
+        THEN
+            format.AppendChr(symbol.value, token);
+            FinishSymbol(symbol, source, invalidSym);
+            RETURN;
+        ELSIF token = "."
+        THEN
+            format.AppendChr(symbol.value, token);
+        ELSE
+            stream.RevertByte(source);
+            FinishSymbol(symbol, source, integerSym);
+            RETURN;
+        END;    
+    END;
 
-    FinishSymbol(symbol, source, nameSym);
+    Files.Read(source.rider, token);
 
-END ScanName;
+    IF token = "0"
+    THEN
+        format.AppendChr(symbol.value, token);
+        Files.Read(source.rider, token);
+            
+        IF (((token >= "a") & (token <= "z")) OR ((token >= "A") & (token <= "Z")))
+        THEN
+            format.AppendChr(symbol.value, token);
+            FinishSymbol(symbol, source, invalidSym);
+            RETURN;
+        ELSIF ((token >= "0") & (token <= "9"))
+        THEN
+            format.AppendChr(symbol.value, token);
+        ELSE
+            stream.RevertByte(source);
+            FinishSymbol(symbol, source, floaterSym);
+            RETURN;
+        END;
+    END;     
+
+    last := "0";
+
+    WHILE ((token >= "0") & (token <= "9"))
+    DO
+        last := token;
+        format.AppendChr(symbol.value, token);
+        Files.Read(source.rider, token);        
+    END;
+
+    IF (((token >= "a") & (token <= "z")) OR ((token >= "A") & (token <= "Z")))
+    THEN
+        format.AppendChr(symbol.value, token);
+        FinishSymbol(symbol, source, invalidSym);
+        RETURN;
+    ELSE
+        IF last = "0"
+        THEN 
+            stream.RevertByte(source);
+            FinishSymbol(symbol, source, invalidSym);
+            RETURN;
+        ELSE
+            stream.RevertByte(source);
+            FinishSymbol(symbol, source, floaterSym);
+            RETURN;
+        END;
+    END;
+
+END ScanNumeral;
 
 PROCEDURE ScanSymbol*(VAR symbol : Symbol; source : stream.File);
 VAR
@@ -97,9 +201,7 @@ VAR
 
 BEGIN
 
-    NEW(symbol);
-
-    (* passing through control characters *)
+    (* pass over through control characters *)
     REPEAT
         IF source.rider.eof
         THEN
@@ -111,19 +213,41 @@ BEGIN
         Files.Read(source.rider, token);
     UNTIL token > 20X;
 
+    (* start symbol processing *)
     StartSymbol(symbol, source);
 
-    IF (((token >= "a") & (token <= "z")) OR ((token >= "A") & (token <= "Z")))
-    THEN
-        stream.RevertByte(source);
-        ScanName(symbol, source);
-        stream.RevertByte(source);
-        RETURN;
-    END;
+    (* determine type of the symbol *)
+    CASE token OF
+        | "A".."Z",
+          "a".."z":
+            (* process nominal symbols *)
+            LoadToken(token, symbol, source);
+            ScanNominal(token, symbol, source);
 
-    format.AppendChr(symbol.value, token);
-    FinishSymbol(symbol, source, invalidSym);
-    RETURN;
+        | "0".."9":
+            (* process numeral symbols *)
+            ScanNumeral(token, symbol, source);
+
+        | "[":
+            format.AppendChr(symbol.value, token);
+            FinishSymbol(symbol, source, lbracketSym);
+
+        | "]":
+            format.AppendChr(symbol.value, token);
+            FinishSymbol(symbol, source, rbracketSym);
+
+        | "(":
+            format.AppendChr(symbol.value, token);
+            FinishSymbol(symbol, source, lparenSym);
+
+        | ")":
+            format.AppendChr(symbol.value, token);
+            FinishSymbol(symbol, source, rparenSym);
+    ELSE
+        (* process invalid symbols *)
+        format.AppendChr(symbol.value, token);
+        FinishSymbol(symbol, source, invalidSym);
+    END;
 
 END ScanSymbol;
 

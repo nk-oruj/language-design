@@ -1,11 +1,11 @@
 
-module MyModule
+module MyModule a
 
 procedure MyProcedure
 record
     myVarA gets [integer]
-    myVarB sets [float]
-    myVarC [float]
+    myVarB sets [floater]
+    myVarC [floater]
 
 scheme
 
@@ -13,16 +13,16 @@ scheme
 
     scheme myFrame
     
-        lift myFrame if (...)
-        drop myFrame if (...)
+        lift myFrame if (123)
+        drop myFrame if (456)
     
     finish myFrame     
 
-    call MyOtherProcedure of MyOtherModule
+    call MyOtherProcedure from MyOtherModule
     record
-        paramA gets (myVarA)
-        paramB gets (myVarC)
-        result sets (myVarB)
+        paramA gets myVarA
+        paramB gets myVarC
+        result sets myVarB
     finish
 
     load myVarC with (add myVarC (mul 3.14 myVarC))
@@ -61,3 +61,8 @@ scheme
 finish
 
 finish MyModule
+
+
+0 0.0 1.0 100.0 132.0 0.2 2.2131 2.0001
+
+100.00 200.0
