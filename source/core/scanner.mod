@@ -77,24 +77,13 @@ BEGIN
 
 END FinishSymbol;
 
-PROCEDURE LoadToken(VAR token : CHAR; VAR symbol : Symbol; source : stream.File);
-BEGIN
- 
-    format.AppendChr(symbol.value, token);
-    Files.Read(source.rider, token);
-
-END LoadToken;
-
 PROCEDURE ScanNominal(VAR token : CHAR; VAR symbol : Symbol; source : stream.File);
 BEGIN
 
-    WHILE (((token >= "a") & (token <= "z")) OR ((token >= "A") & (token <= "Z")))
-    DO
-        LoadToken(token, symbol, source);
+    CASE token OF
+        ""
+    ELSE
     END;
-
-    stream.RevertByte(source);
-    FinishSymbol(symbol, source, nameSym);
 
 END ScanNominal;
 
@@ -221,7 +210,6 @@ BEGIN
         | "A".."Z",
           "a".."z":
             (* process nominal symbols *)
-            LoadToken(token, symbol, source);
             ScanNominal(token, symbol, source);
 
         | "0".."9":
