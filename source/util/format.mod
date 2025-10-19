@@ -27,6 +27,37 @@ BEGIN
     RETURN index;
 END Length;
 
+PROCEDURE Equal*(VAR stringA : ARRAY OF CHAR; stringB : ARRAY OF CHAR) : BOOLEAN;
+VAR
+    lengthA : INTEGER;
+    lengthB : INTEGER;
+    index   : INTEGER;
+
+BEGIN
+
+    lengthA := Length(stringA);
+    lengthB := Length(stringB);
+
+    IF lengthA # lengthB
+    THEN
+        RETURN FALSE;
+    END;
+
+    index := 0;
+    WHILE index < lengthA
+    DO
+        IF stringA[index] # stringB[index]
+        THEN
+            RETURN FALSE;
+        END;
+
+        index := index + 1;
+    END;
+
+    RETURN TRUE;
+
+END Equal;
+
 (*  *)
 
 PROCEDURE AppendStr*(VAR destination : ARRAY OF CHAR; str : ARRAY OF CHAR);

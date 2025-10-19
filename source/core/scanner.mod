@@ -48,7 +48,7 @@ CONST
     andSym*         = 35;
     notSym*         = 36;
     ifSym*          = 37;
-    fromSym*          = 38;
+    fromSym*        = 38;
 
 TYPE
     SymbolDesc* = RECORD
@@ -78,11 +78,78 @@ BEGIN
 END FinishSymbol;
 
 PROCEDURE ScanNominal(VAR token : CHAR; VAR symbol : Symbol; source : stream.File);
+VAR
+    first : CHAR;
+
 BEGIN
 
-    CASE token OF
-        ""
+    first := token;
+
+    WHILE (((token >= "A") & (token <= "Z")) OR ((token >= "a") & (token <= "z")))
+    DO
+        format.AppendChr(symbol.value, token);
+        Files.Read(source.rider, token);
+    END;
+
+    IF ((token >= "0") & (token <= "9"))
+    THEN
+        format.AppendChr(symbol.value, token);
+        FinishSymbol(symbol, source, invalidSym);
+        RETURN;
+    END;
+
+    stream.RevertByte(source);
+    FinishSymbol(symbol, source, nameSym);
+
+    CASE first OF
+        | "a":
+            IF format.Equal(symbol.value, "add") THEN FinishSymbol(symbol, source, addSym); RETURN; END;
+            IF format.Equal(symbol.value, "and") THEN FinishSymbol(symbol, source, andSym); RETURN; END;
+        | "c":
+            IF format.Equal(symbol.value, "call") THEN FinishSymbol(symbol, source, callSym); RETURN; END;
+        | "d":
+            IF format.Equal(symbol.value, "drop") THEN FinishSymbol(symbol, source, dropSym); RETURN; END;
+            IF format.Equal(symbol.value, "div") THEN FinishSymbol(symbol, source, divSym); RETURN; END;
+        | "e":
+            IF format.Equal(symbol.value, "eq") THEN FinishSymbol(symbol, source, eqSym); RETURN; END;
+        | "f":
+            IF format.Equal(symbol.value, "finish") THEN FinishSymbol(symbol, source, finishSym); RETURN; END;
+            IF format.Equal(symbol.value, "from") THEN FinishSymbol(symbol, source, fromSym); RETURN; END;
+        | "g":
+            IF format.Equal(symbol.value, "gets") THEN FinishSymbol(symbol, source, getsSym); RETURN; END;
+            IF format.Equal(symbol.value, "ge") THEN FinishSymbol(symbol, source, geSym); RETURN; END;
+            IF format.Equal(symbol.value, "gt") THEN FinishSymbol(symbol, source, gtSym); RETURN; END;
+        | "i":
+            IF format.Equal(symbol.value, "if") THEN FinishSymbol(symbol, source, ifSym); RETURN; END;
+        | "l":
+            IF format.Equal(symbol.value, "load") THEN FinishSymbol(symbol, source, loadSym); RETURN; END;
+            IF format.Equal(symbol.value, "lift") THEN FinishSymbol(symbol, source, liftSym); RETURN; END;
+            IF format.Equal(symbol.value, "le") THEN FinishSymbol(symbol, source, leSym); RETURN; END;
+            IF format.Equal(symbol.value, "lt") THEN FinishSymbol(symbol, source, ltSym); RETURN; END;
+        | "m":
+            IF format.Equal(symbol.value, "module") THEN FinishSymbol(symbol, source, moduleSym); RETURN; END;
+            IF format.Equal(symbol.value, "mul") THEN FinishSymbol(symbol, source, mulSym); RETURN; END;
+        | "n":
+            IF format.Equal(symbol.value, "ne") THEN FinishSymbol(symbol, source, neSym); RETURN; END;
+            IF format.Equal(symbol.value, "not") THEN FinishSymbol(symbol, source, notSym); RETURN; END;
+        | "o":
+            IF format.Equal(symbol.value, "or") THEN FinishSymbol(symbol, source, orSym); RETURN; END;
+        | "p":
+            IF format.Equal(symbol.value, "procedure") THEN FinishSymbol(symbol, source, procedureSym); RETURN; END;
+        | "r":
+            IF format.Equal(symbol.value, "record") THEN FinishSymbol(symbol, source, recordSym); RETURN; END;
+        | "s":
+            IF format.Equal(symbol.value, "scheme") THEN FinishSymbol(symbol, source, schemeSym); RETURN; END;
+            IF format.Equal(symbol.value, "sets") THEN FinishSymbol(symbol, source, setsSym); RETURN; END;
+            IF format.Equal(symbol.value, "sub") THEN FinishSymbol(symbol, source, subSym); RETURN; END;
+            IF format.Equal(symbol.value, "shr") THEN FinishSymbol(symbol, source, shrSym); RETURN; END;
+            IF format.Equal(symbol.value, "shl") THEN FinishSymbol(symbol, source, shlSym); RETURN; END;
+        | "w":
+            IF format.Equal(symbol.value, "with") THEN FinishSymbol(symbol, source, withSym); RETURN; END;
+        | "x":
+            IF format.Equal(symbol.value, "xor") THEN FinishSymbol(symbol, source, xorSym); RETURN; END;
     ELSE
+        FinishSymbol(symbol, source, nameSym);
     END;
 
 END ScanNominal;

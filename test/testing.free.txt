@@ -1,5 +1,4 @@
-
-module MyModule a
+module MyModule
 
 procedure MyProcedure
 record
@@ -61,8 +60,3 @@ scheme
 finish
 
 finish MyModule
-
-
-0 0.0 1.0 100.0 132.0 0.2 2.2131 2.0001
-
-100.00 200.0
