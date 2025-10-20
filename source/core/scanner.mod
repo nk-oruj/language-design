@@ -1,23 +1,30 @@
-MODULE scanner;
+
 (* atropos *)
+(* module for parsing source files into sequence of symbols *)
+MODULE scanner;
 
 IMPORT
     format, stream;
 
 CONST
+    (* symbol id enumeration *)
 
+    (* misc *)
     invalidSym*     = 0;
     eofSym*         = 1;
 
+    (* separators *)
     lparenSym*      = 2;
     rparenSym*      = 3;
     lbracketSym*    = 4;
     rbracketSym*    = 5;
 
+    (* arbitraries *)
     nameSym*        = 6;
-    integerSym*     = 7;
-    floaterSym*     = 8;
+    intSym*         = 7;
+    fltSym*         = 8;
 
+    (* keywords *)
     procedureSym*   = 9;
     moduleSym*      = 10;
     recordSym*      = 11;
@@ -50,9 +57,23 @@ CONST
     fromSym*        = 38;
 
 TYPE
+    (* record of the symbol *)
+    (* module provides a sequence of these records for given sources *)
+    (* each record with the following properties *)
+    (* id       - the enumerated id for the type of symbol parsed *)
+    (* value    - trimmed out string showing the sequence of *)
+    (*            tokens that represent the symbol in the source *)
+    (*            file. value storage has limited size, and thus *)
+    (*            any arbitrary symbol having longer value than *)
+    (*            storage can hold should be considered invalid *)
+    (*            symbol. *)
+    (* spanA -    position of the first token of the value in source *)
+    (*            file, inclusive. *)
+    (* spanB -    position of the last token of the value in source *)
+    (*            file, inclusive. *)
     SymbolDesc* = RECORD
         id*             : INTEGER;
-        value*          : ARRAY 64 OF CHAR;
+        value*          : ARRAY 32 OF CHAR;
         spanA*          : LONGINT;
         spanB*          : LONGINT;
     END;
@@ -174,7 +195,7 @@ BEGIN
             format.AppendChr(symbol.value, token);
         ELSE
             stream.RevertByte(source);
-            FinishSymbol(symbol, source, integerSym);
+            FinishSymbol(symbol, source, intSym);
             RETURN;
         END;    
     ELSE
@@ -194,7 +215,7 @@ BEGIN
             format.AppendChr(symbol.value, token);
         ELSE
             stream.RevertByte(source);
-            FinishSymbol(symbol, source, integerSym);
+            FinishSymbol(symbol, source, intSym);
             RETURN;
         END;    
     END;
@@ -216,7 +237,7 @@ BEGIN
             format.AppendChr(symbol.value, token);
         ELSE
             stream.RevertByte(source);
-            FinishSymbol(symbol, source, floaterSym);
+            FinishSymbol(symbol, source, fltSym);
             RETURN;
         END;
     END;     
@@ -243,7 +264,7 @@ BEGIN
             RETURN;
         ELSE
             stream.RevertByte(source);
-            FinishSymbol(symbol, source, floaterSym);
+            FinishSymbol(symbol, source, fltSym);
             RETURN;
         END;
     END;
