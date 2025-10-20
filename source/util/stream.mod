@@ -5,9 +5,9 @@ IMPORT
     errors, format;
 
 TYPE
-    FileDesc* = RECORD
-        content*    : Files.File;
-        rider*      : Files.Rider;
+    FileDesc = RECORD
+        content    : Files.File;
+        rider      : Files.Rider;
     END;
     File* = POINTER TO FileDesc;
 
@@ -64,6 +64,27 @@ BEGIN
 
 END OpenNew;
 
+PROCEDURE CloseOld*(VAR file : File);
+BEGIN
+
+    Files.Close(file.content);
+
+END CloseOld;
+
+PROCEDURE CloseNew*(VAR file : File);
+BEGIN
+
+    Files.Register(file.content);
+    Files.Close(file.content);
+
+END CloseNew;
+
+PROCEDURE ReadByte*(file : File; VAR token : CHAR);
+BEGIN
+
+    Files.Read(file.rider, token);
+
+END ReadByte;
 
 PROCEDURE RevertByte*(file : File);
 VAR
@@ -79,5 +100,19 @@ BEGIN
     END;
 
 END RevertByte;
+
+PROCEDURE GetPosition*(file : File; VAR value : LONGINT);
+BEGIN
+
+    value := Files.Pos(file.rider);
+
+END GetPosition;
+
+PROCEDURE IsEOF*(file : File) : BOOLEAN;
+BEGIN
+
+    RETURN file.rider.eof;
+
+END IsEOF;
 
 END stream.

@@ -2,7 +2,6 @@ MODULE scanner;
 (* atropos *)
 
 IMPORT
-    Files, Out,
     format, stream;
 
 CONST
@@ -64,7 +63,7 @@ PROCEDURE^ ScanSymbol*(VAR symbol : Symbol; source : stream.File);
 PROCEDURE StartSymbol(VAR symbol : Symbol; source : stream.File);
 BEGIN
 
-    symbol.spanA := Files.Pos(source.rider);
+    stream.GetPosition(source, symbol.spanA);
     format.Clear(symbol.value);
 
 END StartSymbol;
@@ -73,7 +72,7 @@ PROCEDURE FinishSymbol(VAR symbol : Symbol; source : stream.File; id : INTEGER);
 BEGIN
 
     symbol.id := id;
-    symbol.spanB := Files.Pos(source.rider);
+    stream.GetPosition(source, symbol.spanB);
 
 END FinishSymbol;
 
@@ -88,7 +87,7 @@ BEGIN
     WHILE (((token >= "A") & (token <= "Z")) OR ((token >= "a") & (token <= "z")))
     DO
         format.AppendChr(symbol.value, token);
-        Files.Read(source.rider, token);
+        stream.ReadByte(source, token);
     END;
 
     IF ((token >= "0") & (token <= "9"))
@@ -163,7 +162,7 @@ BEGIN
     IF token = "0"
     THEN
         format.AppendChr(symbol.value, token);
-        Files.Read(source.rider, token);
+        stream.ReadByte(source, token);
         
         IF (((token >= "a") & (token <= "z")) OR ((token >= "A") & (token <= "Z")) OR ((token >= "0") & (token <= "9")))
         THEN
@@ -182,7 +181,7 @@ BEGIN
         WHILE (token >= "0") & (token <= "9")
         DO
             format.AppendChr(symbol.value, token);
-            Files.Read(source.rider, token);
+            stream.ReadByte(source, token);
         END;
  
         IF (((token >= "a") & (token <= "z")) OR ((token >= "A") & (token <= "Z")))
@@ -200,12 +199,12 @@ BEGIN
         END;    
     END;
 
-    Files.Read(source.rider, token);
+    stream.ReadByte(source, token);
 
     IF token = "0"
     THEN
         format.AppendChr(symbol.value, token);
-        Files.Read(source.rider, token);
+        stream.ReadByte(source, token);
             
         IF (((token >= "a") & (token <= "z")) OR ((token >= "A") & (token <= "Z")))
         THEN
@@ -228,7 +227,7 @@ BEGIN
     DO
         last := token;
         format.AppendChr(symbol.value, token);
-        Files.Read(source.rider, token);        
+        stream.ReadByte(source, token);        
     END;
 
     IF (((token >= "a") & (token <= "z")) OR ((token >= "A") & (token <= "Z")))
@@ -257,7 +256,7 @@ BEGIN
     format.AppendChr(symbol.value, token);
     FinishSymbol(symbol, source, lparenSym);
 
-    Files.Read(source.rider, token);
+    stream.ReadByte(source, token);
     IF token # "*"
     THEN
         stream.RevertByte(source);
@@ -266,21 +265,21 @@ BEGIN
 
     WHILE TRUE
     DO
-        Files.Read(source.rider, token);
+        stream.ReadByte(source, token);
         IF token = "*"
         THEN
-            Files.Read(source.rider, token);
+            stream.ReadByte(source, token);
             IF token = ")"
             THEN
                 ScanSymbol(symbol, source);
                 RETURN;
-            ELSIF source.rider.eof
+            ELSIF stream.IsEOF(source)
             THEN
                 StartSymbol(symbol, source);
                 FinishSymbol(symbol, source, eofSym);
                 RETURN;
             END;
-        ELSIF source.rider.eof
+        ELSIF stream.IsEOF(source)
         THEN
             StartSymbol(symbol, source);
             FinishSymbol(symbol, source, eofSym);
@@ -298,14 +297,14 @@ BEGIN
 
     (* pass over through control characters *)
     REPEAT
-        IF source.rider.eof
+        IF stream.IsEOF(source)
         THEN
             StartSymbol(symbol, source);
             FinishSymbol(symbol, source, eofSym);
             RETURN;
         END;
 
-        Files.Read(source.rider, token);
+        stream.ReadByte(source, token);
     UNTIL token > 20X;
 
     (* start symbol processing *)

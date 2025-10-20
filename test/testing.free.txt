@@ -37,4 +37,10 @@ record
     result  sets [I32]
 finish
 
+procedure SecantApproximation
+
+scheme
+    
+finish
+
 finish MyModule

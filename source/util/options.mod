@@ -1,7 +1,7 @@
 MODULE options;
 
 IMPORT
-    Args, Files,
+    Args,
     errors, format, stream;
 
 TYPE
@@ -55,10 +55,8 @@ END CreateSetup;
 PROCEDURE CloseSetup*(VAR setup : OptionsData);
 BEGIN
 
-    Files.Register(setup.target.content);
-    
-    Files.Close(setup.source.content);
-    Files.Close(setup.target.content);
+    stream.CloseOld(setup.source);
+    stream.CloseNew(setup.target);
 
 END CloseSetup;
 
