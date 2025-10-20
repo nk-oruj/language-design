@@ -33,9 +33,9 @@ BEGIN
         format.AppendStr(symbolMessage, symbol.value);
         format.AppendChr(symbolMessage, CHR(34));
         format.AppendStr(symbolMessage, " POS: ");
-        format.AppendInt(symbolMessage, symbol.spanStart);
+        format.AppendInt(symbolMessage, symbol.spanA);
         format.AppendStr(symbolMessage, " SIZE: ");
-        format.AppendInt(symbolMessage, symbol.spanSize);
+        format.AppendInt(symbolMessage, symbol.spanB - symbol.spanA + 1);
         Out.String(symbolMessage); Out.Ln;
         
     UNTIL symbol.id = scanner.eofSym;

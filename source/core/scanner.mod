@@ -53,17 +53,18 @@ CONST
 TYPE
     SymbolDesc* = RECORD
         id*             : INTEGER;
-        spanStart*      : LONGINT;
-        spanEnd*        : LONGINT;
-        spanSize*       : LONGINT;
         value*          : ARRAY 64 OF CHAR;
+        spanA*          : LONGINT;
+        spanB*          : LONGINT;
     END;
     Symbol* = POINTER TO SymbolDesc;
+
+PROCEDURE^ ScanSymbol*(VAR symbol : Symbol; source : stream.File);
 
 PROCEDURE StartSymbol(VAR symbol : Symbol; source : stream.File);
 BEGIN
 
-    symbol.spanStart := Files.Pos(source.rider);
+    symbol.spanA := Files.Pos(source.rider);
     format.Clear(symbol.value);
 
 END StartSymbol;
@@ -72,8 +73,7 @@ PROCEDURE FinishSymbol(VAR symbol : Symbol; source : stream.File; id : INTEGER);
 BEGIN
 
     symbol.id := id;
-    symbol.spanEnd := Files.Pos(source.rider);
-    symbol.spanSize := symbol.spanEnd - symbol.spanStart + 1;
+    symbol.spanB := Files.Pos(source.rider);
 
 END FinishSymbol;
 
@@ -251,6 +251,45 @@ BEGIN
 
 END ScanNumeral;
 
+PROCEDURE ScanComment(VAR token : CHAR; VAR symbol : Symbol; source : stream.File);
+BEGIN
+
+    format.AppendChr(symbol.value, token);
+    FinishSymbol(symbol, source, lparenSym);
+
+    Files.Read(source.rider, token);
+    IF token # "*"
+    THEN
+        stream.RevertByte(source);
+        RETURN;
+    END;
+
+    WHILE TRUE
+    DO
+        Files.Read(source.rider, token);
+        IF token = "*"
+        THEN
+            Files.Read(source.rider, token);
+            IF token = ")"
+            THEN
+                ScanSymbol(symbol, source);
+                RETURN;
+            ELSIF source.rider.eof
+            THEN
+                StartSymbol(symbol, source);
+                FinishSymbol(symbol, source, eofSym);
+                RETURN;
+            END;
+        ELSIF source.rider.eof
+        THEN
+            StartSymbol(symbol, source);
+            FinishSymbol(symbol, source, eofSym);
+            RETURN;
+        END;
+    END;
+
+END ScanComment;
+
 PROCEDURE ScanSymbol*(VAR symbol : Symbol; source : stream.File);
 VAR
     token : CHAR;
@@ -292,8 +331,7 @@ BEGIN
             FinishSymbol(symbol, source, rbracketSym);
 
         | "(":
-            format.AppendChr(symbol.value, token);
-            FinishSymbol(symbol, source, lparenSym);
+            ScanComment(token, symbol, source);
 
         | ")":
             format.AppendChr(symbol.value, token);

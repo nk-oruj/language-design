@@ -1,46 +1,18 @@
 module MyModule
 
-procedure MyProcedure
-record
-    myVarA gets [integer]
-    myVarB sets [floater]
-    myVarC [floater]
-
-scheme
-
-    load myVarA with (mul myVarA (add myVarA 1))
-
-    scheme myFrame
-    
-        lift myFrame if (123)
-        drop myFrame if (456)
-    
-    finish myFrame     
-
-    call MyOtherProcedure from MyOtherModule
-    record
-        paramA gets myVarA
-        paramB gets myVarC
-        result sets myVarB
-    finish
-
-    load myVarC with (add myVarC (mul 3.14 myVarC))
-
-finish
-
 procedure TestingFibonachi
 record
-    index gets [integer]
-    value sets [integer]
+    index gets [I32]
+    value sets [I32]
 
-    elementA [integer]
-    elementB [integer]
-    elementC [integer]
+    elementA [I32]
+    elementB [I32]
+    elementC [I32]
 
 scheme
 
-    load elementA with (0)
-    load elementB with (1)
+    load elementA with 0
+    load elementB with 1
 
     scheme loop
         
@@ -57,6 +29,12 @@ scheme
 
     load value with (elementB)
 
+finish
+
+procedure PromisedProcedure
+record
+    value   gets [I32]
+    result  sets [I32]
 finish
 
 finish MyModule
