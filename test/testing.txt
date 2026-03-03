@@ -1,38 +1,42 @@
 
-(* this is my module declaration *)
-(* i am testing the comments too overall *)
 module MyModule
 
-(* this is a dummy procedure to test *)
-(* the algorithmic implementation of fibonoachi *)
-procedure TestingFibonachi
+structure MyTest
 record
-    index gets [int]
-    value sets [int]
+    fibonA         as [int]
+    fibonB         as [flt]
 
-    elementA [int]
-    elementB [int]
-    elementC [int]
+    testArray      as array of [int]
+    testPoint      as point to [flt]
 
+    procTest       as procedure
+    record
+        ...
+    finish
+
+    someStrTest    as structure
+    record
+        ...
+    finish
+finish
+
+procedure TestingFibonachi(index [int])(value [int])
+record
+    fibonA [int]
+    fibonB [int]
 scheme
+    value = (0)
+    fibonA = (0)
+    fibonB = (1)
 
-    load elementA with 0
-    load elementB with 1
+    HEAD @loop IF <gt index 0>
+        LOAD value AS (add fibonA fibonB)
+        LOAD fibonA AS (fibonB)
+        LOAD fibonB AS (value)
 
-    scheme loop
-        
-        load elementC with (add elementA elementB)
-        load elementA with (elementB)
-        load elementB with (elementC)
-        
-        drop loop if (le index 0)
-        load index with (sub index 1)
-        lift loop
-
-    finish loop
-
-    load value with (elementB)
-
+        LOAD index AS (sub index 1)
+        LIFT @loop
+    TAIL @loop
 finish
 
 finish MyModule

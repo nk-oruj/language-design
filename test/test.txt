@@ -1,21 +1,28 @@
+MODULE MyModule
 
--- myOtherModulio.mod
+(* comment for my lovely structure *)
+STRUCTURE MyLovelyStructureDesc
+RECORD
+    myLovelyStruct : MyOtherLovelyStruct
+    myLovelyInt : int16
+    myLovelyFlt : flt64
+    myLovelyPoint : POINT TO int64
+    myLovelyArray : ARRAY OF int8 SIZED [16]
+    myLovelyProcedure : PROCEDURE(int16, int16, OUT flt32)
+FINISH
 
-myOtherModulio;
+STRUCTURE MyLovelyStructure AS POINT TO MyLovelyStructureDesc
 
-OtherFunctionio:
-    stream.Input integer.Sum stream.Print;
+(* comment for my lovely procedure *)
+PROCEDURE MyLovelyProcedure(myInt : int16, myOtherInt : int16, OUT myResult : flt32)
+RECORD
+    myLocalInt : int16
+SCHEME
+    LOAD myLocalInt WITH [add myInt [mul myOtherInt 3]]
+    CALL MyOtherLovelyProcedure WITH (myLocalInt, OUT myLovelyInt)
 
--- myModulio.mod
+    DEFINE myLabel
+    FINISH myLabel
+FINISH
 
-myModulio;
-
-MainFunctionio:
-    {634} {1245} integer.Sum
-    integer.Dup
-    stream.Print myOtherModulio.OtherFunctionio;
-
-
--- compilation
-
-$ myLang myModulio.MainFunctionio -o main
+FINISH MyModule

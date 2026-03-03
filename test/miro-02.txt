@@ -1,0 +1,34 @@
+
+ 
+
+module MyModule
+    
+...
+
+finish MyModule
+
+ 
+import from MyModule structure MyStructure
+import from MyModule structure TheOtherStructure
+import from MyModule procedure UmaLumpaDoo
+
+
+procedure ...
+record
+    ...
+
+scheme
+
+    ...
+
+finish
+
+ 
+
+scheme ...
+
+    ...
+    drop ... [if ...]
+    lift ... [if ...]
+
+finish ...
