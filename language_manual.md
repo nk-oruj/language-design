@@ -22,7 +22,6 @@ A program file consists of one module.
 ```
 MODULE MyModule
     ... declarations ...
-FINISH MyModule
 ```
 
 A module may contain:
@@ -36,28 +35,11 @@ All declarations inside a module are module-scoped.
 
 # 2. Primitive Types
 
-The language provides fixed-size numeric types:
+The language provides fixed-size primitive types:
 
 - int8, int16, int32, int64
 - flt32, flt64
-
-There is no dedicated boolean type.
-
-## Boolean Interpretation
-
-Boolean logic is represented using integers:
-
-- 0x00 is read false
-- Any non-zero value is read true
-
-Comparison operators return int8:
-
-- 0xFF for true
-- 0x00 for false
-
-Logical operators (and, or, xor, not) operate bitwise and therefore also work for boolean-style values.
-
----
+- bln
 
 # 3. Structures and Pointers
 

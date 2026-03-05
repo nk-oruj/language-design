@@ -21,8 +21,6 @@ SCHEME
     LOAD myLocalInt WITH [add myInt [mul myOtherInt 3]]
     CALL MyOtherLovelyProcedure WITH (myLocalInt, OUT myLovelyInt)
 
-    DEFINE myLabel
+    SCHEME myLabel
     FINISH myLabel
 FINISH
-
-FINISH MyModule

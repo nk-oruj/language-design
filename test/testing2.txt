@@ -1,0 +1,35 @@
+MODULE LinkedList
+
+PROMISE STRUCTURE LinkedListNode
+
+STRUCTURE LinkedListNodeDesc
+RECORD
+    value : int64
+    next : LinkedListNode
+FINISH
+
+STRUCTURE LinkedListNode AS POINT TO LinkedListNodeDesc
+
+STRUCTURE LinkedListDesc
+RECORD
+    size : int64
+    head : LinkedListNode
+FINISH
+
+STRUCTURE LinkedList AS POINT TO LinkedListDesc
+
+PROMISE PROCEDURE PushFront(list : LinkedList, value : int64)
+PROMISE PROCEDURE PushBack(list : LinkedList, value : int64)
+PROMISE PROCEDURE PopFront(list : LinkedList)
+PROMISE PROCEDURE PopBack(list : LinkedList)
+
+PROCEDURE PushFront(list : LinkedList, value : int64)
+RECORD
+    newNode : LinkedListNode
+SCHEME
+    LOAD newNode WITH NEW POINT
+    LOAD VALUE AT newNode.value WITH value
+    LOAD VALUE AT newNode.next WITH VALUE AT list.head
+    LOAD VALUE AT list.head WITH newNode
+    LOAD int64 AT list.size WITH [list]
+FINISH
