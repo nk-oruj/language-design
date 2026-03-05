@@ -18,18 +18,23 @@ FINISH
 
 STRUCTURE LinkedList AS POINT TO LinkedListDesc
 
-PROMISE PROCEDURE PushFront(list : LinkedList, value : int64)
-PROMISE PROCEDURE PushBack(list : LinkedList, value : int64)
-PROMISE PROCEDURE PopFront(list : LinkedList)
-PROMISE PROCEDURE PopBack(list : LinkedList)
+PROCEDURE CreateNewNode(value : int64, next : LinkedListNode, OUT node : LinkedListNode)
+SCHEME
+    LOAD node WITH NEW POINT
+    LOAD VALUE AT node.value WITH value
+    LOAD VALUE AT node.next WITH node
+FINISH
 
 PROCEDURE PushFront(list : LinkedList, value : int64)
 RECORD
     newNode : LinkedListNode
+    size : int64
 SCHEME
-    LOAD newNode WITH NEW POINT
-    LOAD VALUE AT newNode.value WITH value
-    LOAD VALUE AT newNode.next WITH VALUE AT list.head
-    LOAD VALUE AT list.head WITH newNode
-    LOAD int64 AT list.size WITH [list]
+    CALL CreateNewNode WITH (value, VALUE AT list.head, OUT newNode)
+    LOAD FIELD AT list.head WITH newNode
+    
+    LOAD size WITH VALUE AT list.size
+    LOAD size WITH [add size 1]
+    LOAD FIELD AT list.size WITH [size]
 FINISH
+
