@@ -4,37 +4,34 @@ PROMISE STRUCTURE LinkedListNode
 
 STRUCTURE LinkedListNodeDesc
 RECORD
-    value : int64
-    next : LinkedListNode
+    value Int64
+    nextNode LinkedListNode
 FINISH
 
 STRUCTURE LinkedListNode AS POINT TO LinkedListNodeDesc
 
 STRUCTURE LinkedListDesc
 RECORD
-    size : int64
-    head : LinkedListNode
+    size Int64
+    headNode LinkedListNode
 FINISH
 
-STRUCTURE LinkedList AS POINT TO LinkedListDesc
+STRUCTURE LinkedList POINT TO LinkedListDesc
 
-PROCEDURE CreateNewNode(value : int64, next : LinkedListNode, OUT node : LinkedListNode)
+PROCEDURE CreateNewNode(value Int64, next LinkedListNode, OUT node LinkedListNode)
 SCHEME
-    LOAD node WITH NEW POINT
-    LOAD VALUE AT node.value WITH value
-    LOAD VALUE AT node.next WITH node
+
+    ...
+
 FINISH
 
-PROCEDURE PushFront(list : LinkedList, value : int64)
+PROCEDURE PushFront(list LinkedList, value Int64)
 RECORD
-    newNode : LinkedListNode
-    size : int64
+    newNode LinkedListNode
+    size int64
 SCHEME
-    CALL CreateNewNode WITH (value, VALUE AT list.head, OUT newNode)
-    LOAD FIELD AT list.head WITH newNode
-    
-    LOAD size WITH VALUE AT list.size
-    LOAD size WITH [add size 1]
-    LOAD FIELD AT list.size WITH [size]
+
+    ...
+
 FINISH
 
