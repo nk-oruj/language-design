@@ -1,59 +1,100 @@
 # Language Manual
 
-## Introduction
+# 1. Program
 
-This document introduces the core syntax and semantics of the language in design. It is not a formal specification. Instead, it explains how to read and write programs using the fundamental constructs.
-
-The language is designed to be:
-
-- Explicit
-- Deterministic
-- Structurally clear
-- Low‑level but readable
-
-There are no hidden behaviors, implicit conversions, or automatic memory management. Every operation must be written intentionally.
-
----
-
-# 1. Program Structure
-
-A program file consists of one module.
-
+### a. a program file consists of a module with a heading declaration of module
 ```
-MODULE MyModule
-    ... declarations ...
+module ModuleName
 ```
 
-A module may contain:
+### b. a module may contain two types of elementary declarations following the declaration of module
+- `structure` declaration
+- `procedure` declaration
 
-- STRUCTURE declarations
-- PROCEDURE declarations
+### c. all declarations inside a module are module-scoped outside
 
-All declarations inside a module are module-scoped.
+# 2. Primitives
 
----
+### a. primitive types consist of integer, float, and boolean standards 
+- integer - `int8`, `int16`, `int32`, `int64`
+- float - `flt32`, `flt64`
+- boolean - `bln`
 
-# 2. Primitive Types
+# 3. Literals
 
-The language provides fixed-size primitive types:
+### a. literal constants consist of integer, decimal, and boolean formats
+- integer - `^(0|[-+]?[1-9][0-9]*)$`
+- decimal - `^(0|[-+]?[1-9][0-9]*.[0-9]+)$`
+- boolean - `^(true|false)$`
 
-- int8, int16, int32, int64
-- flt32, flt64
-- bln
+# 4. Names
 
-# 3. Structures and Pointers
+### a. all names are formatted strictly with letters, no digits, no symbols
+`^([a-zA-Z]+)$`
 
-Structures are defined in two ways:
+# 5. Expressions
 
+### a. expressions are strictly scoped with brackets and are evalualted in pre-fix order
 ```
-STRUCTURE NodeDesc
-RECORD
-    value : int32
-    next  : Node
-FINISH
-
-STRUCTURE Node AS POINT TO NodeDesc
+[operation operand operand]
 ```
+
+### b. expressions support arithmetic, bitwise arithmetic, comparison and logic operations
+- arithmetic (in numeral, out numeral) - add, sub, mul, div, mod
+- bitwise (in integer, out integer) - and, or, xor, not
+- comparison (in numeral, out boolean) - lt, le, gt, ge, eq, ne
+- logic (in boolean, out boolean) - and, or, xor, not
+
+### c. expression operands can be either a name, a literal, or another nested expression
+
+# 6. Records
+
+### a. records are fields of variable declarations used both in structure and procedure declarations
+```
+record
+    variableOne : typeOne
+    variableTwo : typeTwo
+```
+
+### c. variable type can either be a primitive, a structure definition, a procedure template, an array of the first two, or a point of the first two
+```
+record
+    variableInt     : int32
+    variableFlt     : flt32
+    variableBln     : bln
+    variableMyType  : MyType
+    variableProc    : procedure(myInt : int32, myFlt : flt32, myBln : out bln)
+    variableArray   : array of int32 sized 16
+    variablePoint   : point to MyType
+```
+
+# 7. Structures
+
+### a. structure template consists of keyword structure and a name
+```
+structure StructureName
+```
+
+### b. structure declaration names a new typing through structure template for either a record declaration or an already existing typing
+```
+structure StructureName
+record
+    variableInt : int32
+finish
+
+structure MyOtherStructure as array of int32 sized 16
+```
+
+### c. structure declaration should end with keyword finish in case of naming a record declaration
+
+# 8. Procedures
+
+### a. procedure template consists of keyword procedure, a name, and paramaters declaration
+```
+procedure ProcedureName(paramOne : typeOne, paramTwo : out typeTwo)
+```
+
+### b. 
 
 ## Pointer Allocation
 
@@ -77,42 +118,6 @@ Check for null with expression:
 
 ---
 
-# 4. Expressions
-
-Expressions use prefix bracket notation:
-
-```
-[add a b]
-[mul x [add y 3]]
-```
-
-Supported operators:
-
-Arithmetic:
-
-- add, sub, mul, div, mod
-
-Bitwise / Logical:
-
-- and, or, xor, not
-
-Comparison:
-
-- lt, le, gt, ge, eq, ne
-
-Nil check:
-
-- nil
-
-Expressions are evaluated:
-
-- Strictly
-- Left-to-right
-- Fully (no short-circuiting)
-
-Type mismatches are compile-time errors.
-
----
 
 # 5. Assignment
 
@@ -201,20 +206,4 @@ Rules:
 - You cannot jump into a block from outside.
 
 ---
-
-# 8. Design Principles
-
-This language follows these principles:
-
-- No implicit memory allocation
-- No implicit dereferencing
-- No implicit type conversion
-- No hidden control flow
-- All mutation is explicit
-
-The goal is structural clarity and deterministic execution.
-
----
-
-End of Manual
-
+end of manual
