@@ -1,209 +1,688 @@
 # Language Manual
 
-# 1. Program
+## Names
 
-### a. a program file consists of a module with a heading declaration of module
+```regexp
+^[_a-z][_a-zA-Z0-9]+$
 ```
-module ModuleName
-```
+- All names are preferred to be in snake case.
 
-### b. a module may contain two types of elementary declarations following the declaration of module
-- `structure` declaration
-- `procedure` declaration
+## Literals
 
-### c. all declarations inside a module are module-scoped outside
+### Integers
 
-# 2. Primitives
-
-### a. primitive types consist of integer, float, and boolean standards 
-- integer - `int8`, `int16`, `int32`, `int64`
-- float - `flt32`, `flt64`
-- boolean - `bln`
-
-# 3. Literals
-
-### a. literal constants consist of integer, decimal, and boolean formats
-- integer - `^(0|[-+]?[1-9][0-9]*)$`
-- decimal - `^(0|[-+]?[1-9][0-9]*.[0-9]+)$`
-- boolean - `^(true|false)$`
-
-# 4. Names
-
-### a. all names are formatted strictly with letters, no digits, no symbols
-`^([a-zA-Z]+)$`
-
-# 5. Expressions
-
-### a. expressions are strictly scoped with brackets and are evalualted in pre-fix order
-```
-[operation operand operand]
+```regexp
+^(0|[-+]?[1-9][0-9]*)$
 ```
 
-### b. expressions support arithmetic, bitwise arithmetic, comparison and logic operations
-- arithmetic (in numeral, out numeral) - add, sub, mul, div, mod
-- bitwise (in integer, out integer) - and, or, xor, not
-- comparison (in numeral, out boolean) - lt, le, gt, ge, eq, ne
-- logic (in boolean, out boolean) - and, or, xor, not
+### Decimals
 
-### c. expression operands can be either a name, a literal, or another nested expression
-
-# 6. Records
-
-### a. records are fields of variable declarations used both in structure and procedure declarations
+```regexp
+^(0|[-+]?[1-9][0-9]*.[0-9]+)$
 ```
+
+### Booleans*
+
+```regexp
+^(true|false)$
+```
+
+## Module
+
+- A source file represents a module.
+- All declared names share a single namespace under the module.
+
+```text
+module ...
+
+import
+    ...
+
+structure ...
 record
-    variableOne : typeOne
-    variableTwo : typeTwo
-```
-
-### c. variable type can either be a primitive, a structure definition, a procedure template, an array of the first two, or a point of the first two
-```
-record
-    variableInt     : int32
-    variableFlt     : flt32
-    variableBln     : bln
-    variableMyType  : MyType
-    variableProc    : procedure(myInt : int32, myFlt : flt32, myBln : out bln)
-    variableArray   : array of int32 sized 16
-    variablePoint   : point to MyType
-```
-
-# 7. Structures
-
-### a. structure template consists of keyword structure and a name
-```
-structure StructureName
-```
-
-### b. structure declaration names a new typing through structure template for either a record declaration or an already existing typing
-```
-structure StructureName
-record
-    variableInt : int32
+    ...
 finish
 
-structure MyOtherStructure as array of int32 sized 16
-```
+symbol
+    ...
 
-### c. structure declaration should end with keyword finish in case of naming a record declaration
-
-# 8. Procedures
-
-### a. procedure template consists of keyword procedure, a name, and paramaters declaration
-```
-procedure ProcedureName(paramOne : typeOne, paramTwo : out typeTwo)
-```
-
-### b. 
-
-## Pointer Allocation
-
-Allocate memory:
-
-```
-LOAD node WITH NEW POINT
-```
-
-Assign null:
-
-```
-LOAD node WITH NIL POINT
-```
-
-Check for null with expression:
-
-```
-[nil node]
+static
+    ...
+    
+procedure ... (...)
+define
+    ...
+scheme
+    ...
+finish
 ```
 
 ---
 
+## Imports
 
-# 5. Assignment
-
-All mutation is performed using the LOAD statement.
-
-```
-LOAD variable WITH expression
-```
-
-## Writing Through Pointers
-
-Dereferencing is explicit:
-
-```
-LOAD int32 AT node.value WITH 10
+```text
+import
+    SYSTEM
+    graphics
 ```
 
-Rules:
+- Imported names are referenced through qualification.
 
-- `node.value` produces a pointer to the field.
-- `LOAD Type AT pointer WITH value` writes into memory.
-- Dereferencing NIL causes a runtime error.
-
-## Arrays
-
+```text
+SYSTEM.MIN_INT64
+graphics.clear_screen
 ```
-LOAD array AT index WITH value
-```
-
-Out-of-bounds access is a runtime error.
 
 ---
 
-# 6. Procedures
+## Structures
 
-Procedure structure:
+- Compile-time semantic declarations of types with records.
 
+```text
+structure point
+record
+    x: flt32
+    y: flt32
+finish
 ```
-PROCEDURE Example(a : int32, OUT result : int32)
-RECORD
-    temp : int32
-SCHEME
-    LOAD temp WITH [add a 1]
-    LOAD result WITH temp
-FINISH
-```
-
-Rules:
-
-- All OUT parameters must be assigned before the procedure finishes.
-- Local variables are declared in the RECORD block.
 
 ---
 
-# 7. Control Flow (Temporary)
+## Symbols
 
-Control flow uses labeled blocks inside procedure SCHEME.
+- Compile-time semantic declarations of constants.
 
-```
-SCHEME Loop
-    ... statements ...
-FINISH Loop
-```
-
-Execution normally flows from top to bottom.
-
-## DROP
-
-```
-DROP Loop IF condition
+```text
+symbol
+    max_players: int32 1024
+    pi_digits: int32 314159
 ```
 
-If condition is true (non-zero), execution jumps to the statement after FINISH Loop.
+Restrictions:
 
-## LIFT
+- Must use unit types.
+- Values must be literals.
+- No expressions.
 
-```
-LIFT Loop IF condition
-```
-
-If condition is true, execution jumps to the first statement inside SCHEME Loop.
-
-Rules:
-
-- Labels must be lexically enclosing.
-- You cannot jump into a block from outside.
+No runtime storage generated. The values are pasted directly inside the instructions.
 
 ---
-end of manual
+
+## Statics
+
+Run-time declarations of module-scoped variables. (bss section)
+
+```
+static
+    my_int: int32
+    my_message: array 128 of int8
+```
+
+---
+
+## Procedures
+
+Run-time declarations of executable code. (text section)
+
+```text
+procedure my_procedure (...)
+define
+    ...
+scheme
+    ...
+finish
+```
+
+---
+
+## Types
+
+### Unit Types (Primitives)
+
+#### Signed Integers
+
+```text
+int8, int16, int32, int64
+```
+
+#### Unsigned integers
+
+```text
+uint8, uint16, uint32, uint64
+```
+
+#### Floats
+
+```text
+flt32, flt64
+```
+
+#### Boolean
+
+```text
+bln
+```
+
+---
+
+### Record Types
+
+- Defined through structures.
+
+```text
+structure point
+record
+    x: flt32
+    y: flt32
+finish
+```
+
+- Usage
+
+```text
+point
+```
+
+- Properties 
+    * Fixed layout.
+    * Fixed size.
+    * Not assignable as a whole.
+    * Not passable by value.
+
+- there is no type aliasing system and only record can receive names through structure declarations.
+
+---
+
+### Array Types
+
+```text
+array 16 of int32
+array 1024 of point
+```
+
+- Properties
+    * Fixed layout.
+    * Fixed size.
+    * Not assignable as a whole.
+    * Not passable by value.
+
+---
+
+### Reference Types
+
+#### Unit references
+
+```text
+ref int32
+```
+
+#### Record references
+
+```text
+ref point
+```
+
+#### Array references
+
+```text
+ref array of int32
+```
+
+#### Procedure references
+
+```text
+ref procedure (...)
+```
+
+---
+
+## Types (Continuation)
+
+### Record Field Selection
+
+- Field selection from a record yields the type of the field.
+
+```text
+structure point
+record
+    x: flt32
+    y: flt32
+finish
+
+...
+
+my_point: point
+
+...
+
+my_point (is point)
+my_point.x (is flt32)
+```
+
+- Field selection from a record reference yields the reference to field with its type.
+
+```text
+my_point_ref: ref point
+
+...
+
+my_point (is ref point)
+my_point.x (is ref flt32)
+```
+
+---
+
+### Array Element Selection
+
+- Element selection from an array yields the type of the element.
+
+```text
+index: int64
+my_array: array 16 of int32
+
+...
+
+my_array (is array 16 of int32)
+my_array[index] (is int32)
+```
+
+- Element selection from an array reference yields reference to the element with its type.
+
+```text
+index: int64
+my_array_ref: ref array of int32
+
+...
+
+my_array (is ref array of int32)
+my_array[index] (is ref int32)
+```
+
+---
+
+### Procedure Parameters
+
+- Allowed types for procedure parameters
+
+#### Unit Parameters
+
+```text
+..., value: int32, ...
+```
+
+#### Unit Reference parameters
+
+```text
+..., value: ref int32, ...
+```
+
+#### Record Reference parameters
+
+```text
+..., value: ref point, ...
+```
+
+#### Array Reference parameters
+
+```text
+..., values: ref array of int32, ...
+```
+
+#### Procedure Reference parameters
+
+```text
+..., callback: ref procedure (...), ...
+```
+
+## Procedures
+
+### Procedure Variables Block
+
+- Variables to be put in stack and to be used throughout procedure execution are declared initially in a `define` block.
+
+```text
+define
+    my_local_int: int32
+    my_local_arr: array 32 of flt64
+    ...
+```
+
+---
+
+### Procedure Statements Block
+
+- Then the procedure statements are declared in a `scheme` block after.
+
+```text
+scheme
+    my_local_int: load 0
+    my_local_arr[0]: load 0
+    ...
+finish
+```
+
+---
+
+## Expressions
+
+- Expressions use prefix notation.
+
+```text
+[add 1 2]
+```
+
+- Expressions are written within brackets and can be nested.
+
+```text
+[mul [add 1 2] 5]
+```
+
+### Operations
+
+#### Arithmetic Operations
+
+```text
+add, sub, mul, div, mod
+```
+
+```text
+int, int to int
+flt, flt to flt
+```
+
+---
+
+#### Bitwise Operations
+
+```text
+and, or, xor, not, shr, shl
+```
+
+```text
+int(, int) to int
+```
+
+---
+
+#### Boolean Operations
+
+```text
+and, or, xor, not
+```
+
+```text
+bln(, bln) to bln
+```
+
+---
+
+#### Comparison Operations
+
+```text
+eq, ne, ge, gt, le, lt
+```
+
+```text
+int, int to bln
+flt, flt to bln
+```
+
+---
+
+#### Reference Operations
+
+```text
+ref variable
+```
+
+- Produces a reference.
+
+```text
+val pointer
+```
+
+- Reads a value from a reference.
+
+```text
+len values
+```
+
+- obtains lengths of arrays and referenced arrays with appropriate compile-time solutions.
+
+---
+
+## Statements
+
+### Assignments
+
+#### Load
+
+- Assigns value to local storage.
+
+```text
+counter: int32
+```
+
+```text
+counter: load 0
+```
+
+```text
+counter: load [add counter 1]
+```
+
+---
+
+#### Pass
+
+- Assigns value to storage through references.
+
+```text
+sum: ref int32
+```
+
+```text
+sum: pass 100
+```
+
+```text
+sum: pass [add [val sum] 1]
+```
+
+---
+
+### Invocations
+
+#### Exec
+
+```text
+procedure some_procedure (value: int32, result: ref int32)
+
+...
+
+my_value: int32
+my_result: int32
+
+...
+
+some_procedure: exec (my_value, ref my_result)
+```
+
+- Expressions can't be put in parameter fields (*except ref usage which doesn't count as expression)
+
+---
+
+### Control Flow
+
+```text
+scheme loop
+    ...
+finish loop
+```
+
+- Control flow uses named scheme blocks inside procedure scheme blocks.
+- Named scheme blocks can be nested.
+- Two other statements are allowed to be used inside with its name.
+
+---
+
+## Drop
+
+- Exits the scheme block with the given name.
+
+```text
+loop: drop
+```
+
+- Allows conditional usage
+
+```text
+loop: drop if [ge index count]
+```
+
+---
+
+## Redo
+
+- Restarts the execution of the scheme block with the given name.
+
+```text
+loop: redo
+```
+
+- Allows conditional usage
+
+```text
+loop: redo if [lt index count]
+```
+
+---
+
+# Example
+
+```text
+module my_module
+
+import
+    SYSTEM
+
+structure point
+record
+    x: flt32
+    y: flt32
+finish
+
+procedure array_sum (arr: ref array of int64, sum: ref int64)
+define
+    index: int64
+scheme
+    index: load 0
+    scheme loop
+        loop: drop if [ge index [len arr]]
+        sum: pass [add [val sum] [val arr index]]
+        index: load [add index 1]
+        loop: redo
+    finish loop
+finish
+
+procedure array_max (arr: ref array of int64, max: ref int64)
+define
+    index: int64
+    element: int64
+scheme
+    max: pass SYSTEM.MIN_INT64
+    index: load 0
+
+    scheme loop
+        loop: drop if [ge index [len arr]]
+        element: load [val arr index]
+
+        scheme check
+            check: drop if [ge max element]
+            max: pass element
+        finish check
+
+        index: load [add index 1]
+        loop: redo
+    finish loop
+finish
+
+procedure string_freq (string: ref array of uint8, frequencies: ref array of int64)
+define
+    index: uint64
+    char: uint8
+scheme
+    scheme check
+        check: drop if [ne [len frequencies] 256]
+
+        index: load 0
+        scheme loop
+            loop: drop if [ge index 256]
+            frequencies[index]: pass 0
+            index: load [add index 1]
+            loop: redo
+        finish loop
+
+        index: load 0
+        scheme loop
+            loop: drop if [ge index [len string]]
+            char: load [val string index]
+            frequencies[char]: pass [add [val frequencies char] 1]
+            index: load [add index 1]
+            loop: redo
+        finish loop
+    finish check
+finish
+
+procedure point_add (a: ref point, b: ref point, result: ref point)
+scheme
+    result.x: pass [add [val a.x] [val b.x]]
+    result.y: pass [add [val a.y] [val b.y]]
+finish
+
+procedure binary_search (arr: ref array of int64, value: int64, index: ref int64)
+define
+    left_index: int64
+    right_index: int64
+scheme
+    left_index: load 0
+    right_index: load [sub [len arr] 1]
+
+    scheme loop
+        index: pass [div [add left_index right_index] 2]
+
+        scheme check
+            scheme less_case
+                less_case: drop if [gt value [val arr [val index]]]
+                right_index: load [val index]
+                check: drop
+            finish less_case
+            scheme right_case
+                left_index: load [val index]
+            finish right_case
+        finish check
+
+        loop: redo if [ne value [val arr [val index]]]
+    finish loop
+finish
+```
+
+---
+
+# Outstanding Questions
+
+The following areas are not yet fully specified:
+
+* Null reference semantics.
+* String type design.
+* Explicit type aliases.
+* Procedure reference invocation rules.
+* Integer promotion rules.
+* Implicit conversions.
+* Bounds checking policy.
+* Forward structure declarations.
+* Circular structure references.
+* Module visibility/export rules.
+* Exact runtime representation of `ref array of T`.
